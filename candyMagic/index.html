@@ -1,0 +1,99 @@
+<html>
+  <head>
+    <title>Candy Magic</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.green-light_green.min.css">
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+<body>
+  <div id="connection">
+    <div id="title">Candy Magic</div>
+    <button id="find" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Connect</button>
+  </div>
+  <div id="connected">
+    <button id="d01" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"></button>
+    <button id="d02" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"></button>
+    <button id="d03" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"></button>
+    <button id="d04" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"></button>
+  </div>
+  <div id="dispensing">
+    <div id="loader"><img id="loader-gif" src="./images/loader.gif"></div>
+  </div>
+
+  <script type="text/javascript">
+  function connectedHandler() {
+      document.querySelector("#connection").style.setProperty("display", "none");
+      document.querySelector("#connected").style.setProperty("display", "block");
+  }
+  function handleCandyMagic (characteristic) {
+      var data = new Uint8Array([1]);
+      characteristic[0].writeValue(data);
+      document.getElementById("d01").addEventListener("mousedown", dispense);
+      document.getElementById("d02").addEventListener("mousedown", dispense);
+      document.getElementById("d03").addEventListener("mousedown", dispense);
+      document.getElementById("d04").addEventListener("mousedown", dispense);
+      function dispense(event) {
+          var data = new Uint8Array([1]);
+          dispenseId=event.target.parentNode.id;
+          data[0]=parseInt(dispenseId.replace("d", ""));
+          // data[0]=parseInt(10*Math.random()%4)+1;
+          dispansing(data[0]);
+          console.log(data[0]);
+          characteristic[0].writeValue(data);
+      }
+      
+      function dispansing(sec) {
+          document.getElementById("connected").style.setProperty("display", "none");
+          document.getElementById("connected").style.setProperty("opacity", "0");
+          document.getElementById("dispensing").style.setProperty("display", "block");
+          setTimeout(
+          function() {
+                  document.getElementById("dispensing").style.setProperty("display", "none");
+                  document.getElementById("connected").style.setProperty("display", "block");
+                  setTimeout(function(){
+                      document.getElementById("connected").style.setProperty("opacity", "1");
+                  }, 20);
+              }, sec*1000);
+      }
+  }
+  function service (service) {
+      console.log(service);
+      Promise.all([
+          service.getCharacteristic('19b10001-e8f2-537e-4f6c-984fee0f808e')
+      ]).then(handleCandyMagic, error);
+  }
+
+  function gatt (server) {
+      console.log(server);
+      server.ongattserverdisconnected=function(msg){
+          console.error("[server disconnected] ", msg);
+      };
+      server.getPrimaryService('19b10000-e8f2-537e-4f6c-984fee0f808e').then(service, error);
+      connectedHandler();
+  }
+
+  function found (device) {
+      console.log(device);
+      device.gatt.connect().then(gatt, error);
+  }
+
+  function error (e) {
+      console.log(e);
+  }
+
+
+  function find () {
+      var options = {
+          filters: [{
+              services: ["19b10000-e8f2-537e-4f6c-984fee0f808e"], // LED Service
+              namePrefix: 'CandyMgc'
+          }]
+      };
+      navigator.bluetooth.requestDevice(options).then(found, error);
+  }
+
+  document.getElementById("find").addEventListener("click", find, false);
+  </script>
+</body>
