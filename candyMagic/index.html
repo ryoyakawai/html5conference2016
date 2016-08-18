@@ -29,7 +29,6 @@
   }
   function handleCandyMagic (characteristic) {
       var data = new Uint8Array([1]);
-      characteristic[0].writeValue(data);
       document.getElementById("d01").addEventListener("mousedown", dispense);
       document.getElementById("d02").addEventListener("mousedown", dispense);
       document.getElementById("d03").addEventListener("mousedown", dispense);
