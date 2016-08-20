@@ -1,6 +1,6 @@
 body { 
   margin: 0 auto;
-  background-color: #555;
+  background-color: #888;
   max-width: 300px;
   font-family: Roboto;
   color: white;
@@ -15,7 +15,7 @@ body {
   text-align: center;
   width: 100%;
   padding: 12px 0;
-  padding-top: 340px;
+  padding-top: 280px;
 }
 #connect { 
   color: white;
@@ -26,7 +26,8 @@ body {
 #connected {
   opacity: 1;
   transition: 0.5s;
-  padding-top: 210px;
+  text-align: center;
+  padding-top: 160px;
   display: none;
 }
 #d01, #d02, #d03, #d04 { 
@@ -52,7 +53,7 @@ body {
   width: 100%;
 }
 #loader-gif { 
-  padding-top: 240px;
+  padding-top: 200px;
   width:150px;
   height:150px;
 }
