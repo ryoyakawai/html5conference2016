@@ -1,0 +1,18 @@
+body {
+  margin:0 auto;
+  max-width:640px;
+  background:#000000;
+}
+div#container { 
+  text-align: center;
+  margin-top:50px;
+  width:640px;
+  border:0px;
+}
+#blebutton {  
+  text-align: center;
+}
+#find {
+  margin-top:50px;
+  width: 400px;
+}

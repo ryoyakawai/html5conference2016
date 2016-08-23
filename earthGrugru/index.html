@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>Earth GruGru</title>
+    <link rel="icon" sizes="192x192" href="favicon.png">
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.green-light_green.min.css">
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+
+    <div id="blebutton">
+      <button id="find" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Connect</button>
+    </div>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.js" charset="utf-8"></script>
+    <script type="text/javascript">
+
+    function handleAcc (characteristic) {
+        return characteristic.startNotifications()
+                             .then(function(data){
+            characteristic.addEventListener("characteristicvaluechanged", function(data){
+                var angleX = convert(data.target.value.getFloat32(0, true));
+                var angleY = convert(data.target.value.getFloat32(4, true));
+                var angleZ = convert(data.target.value.getFloat32(8, true));
+                console.log("y: ", angleY);
+                if(typeof sphere!="undefined") {
+                    //sphere.rotation.x=Math.PI*angleX;
+                    sphere.rotation.y=angleY;
+                    //sphere.rotation.z=Math.PI*angleZ;
+                }
+                function convert(value) {
+                    return 2*Math.PI*value;
+                }
+            });
+        });
+    }
+    function service (service) {
+        console.log(service);
+        Promise.all([
+            service.getCharacteristic('917649a1-d98e-11e5-9eec-984fee0f808e') // Acc
+                   .then(handleAcc, error),
+        ]);
+        document.querySelector("#blebutton").style.setProperty("display", "none");
+    }
+
+    function gatt (server) {
+        console.log(server);
+        server.ongattserverdisconnected=function(msg){
+            console.error("[server disconnected] ", msg);
+        };
+        server.getPrimaryService('917649a0-d98e-11e5-9eec-984fee0f808e').then(service, error);
+    }
+
+    function found (device) {
+        console.log(device);
+        device.gatt.connect().then(gatt, error);
+    }
+
+    function error (e) {
+        console.log(e);
+    }
+
+    function find () {
+        var options = {
+            filters: [{
+                services: ["917649a0-d98e-11e5-9eec-984fee0f808e"],
+                namePrefix: 'eGruGru'
+            }]
+        };
+        navigator.bluetooth.requestDevice(options).then(found, error);
+    }
+
+    document.getElementById("find").addEventListener("click", find, false);
+    </script>
+    <script type="text/javascript">
+    var height = 640;
+    var width  = 640;
+    
+    // Renderer
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(height, width);
+    renderer.setClearColor(0x000000, 1);
+
+    // Add element
+    document.querySelector("#container").appendChild(renderer.domElement);
+
+    // Scene
+    var scene = new THREE.Scene();
+    
+    // Camera 
+    var camera=new THREE.PerspectiveCamera(73, width/height, 0.1, 10);
+    camera.position=new THREE.Vector3(0, 0, 8);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+    scene.add(camera);
+
+    // Light
+    var light = new THREE.DirectionalLight(0xffffff);
+    var pos=(Math.PI*23.4/180.0);
+    light.position = new THREE.Vector3(pos, pos, pos);
+    scene.add(light);
+
+    var ambientLight = new THREE.AmbientLight(0x333333);
+    scene.add(ambientLight);
+
+    // Sphere
+    var geometry = new THREE.SphereGeometry(1, 32, 32);
+    var loader=new THREE.TextureLoader();
+    var textureEarth=loader.load("images/earth.jpg");
+    var material = new THREE.MeshPhongMaterial( {map: textureEarth});    
+    var sphere = new THREE.Mesh(geometry, material);
+    sphere.rotation.y = Math.PI;
+    scene.add(sphere);
+        
+    // Render
+    var baseTime = +new Date;
+    function render() {
+        requestAnimationFrame(render);
+        camera.position.x=1;
+        camera.position.y=1;
+        camera.position.z=1;
+        renderer.render(scene, camera);
+
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+    }   
+    render();
+    
+    </script>
+  </body>
+</html>
