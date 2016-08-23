@@ -18,6 +18,9 @@ const int TRIM_VAL_MAX=1023;
 
 void setup() {
   Serial.begin(9600);
+  while (!Serial);    // wait for the serial port to open
+
+  Serial.println("Candy Magic Started");
 
   // set Motor/LED pin to output mode
   pinMode(motorPin, OUTPUT);
@@ -37,7 +40,6 @@ void setup() {
   // begin advertising BLE service:
   blePeripheral.begin();
 
-  Serial.println("BLE LED Peripheral");
 }
 
 void loop() {
@@ -74,15 +76,14 @@ void loop() {
               break;              
           }
           // get Trim value
-          int trim = map(analogRead(trimPin), TRIM_VAL_MIN, TRIM_VAL_MAX, 0, 100);
-          Serial.println(duration);
+          int trimedDuration = duration * map(analogRead(trimPin), TRIM_VAL_MIN, TRIM_VAL_MAX, 0, 100);
+          Serial.println(trimedDuration);
 
           digitalWrite(motorPin, HIGH);         // will turn the motor on
           digitalWrite(ledPin, HIGH);         // will turn the LED on
-          delay(duration * trim);
+          delay(trimedDuration);
           digitalWrite(motorPin, LOW);          // will turn the motor off
           digitalWrite(ledPin, LOW);          // will turn the LED off
-          Serial.println("LED off");
 
         }
       }
