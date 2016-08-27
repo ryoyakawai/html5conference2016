@@ -378,14 +378,16 @@ Application.prototype.onload = function() {
                     fireEvent("button_egloop");
                 }
                 // Update knob_fine
-                if (ccmsg == 0x00) {
+                //if (ccmsg == 0x00) {
+                if (ccmsg == 0x14) {
                     var vmin=530, vmax=458;
                     var val=parseInt(msg[2])/127;
                     p.theFaderView_velocity.onUpdateValue(val);
                     document.getElementById("knob_velocity").style.setProperty("top", vmax-(1-val)*(vmax-vmin)+"px");
                 }
                 // Update ratio or fixed
-                if (ccmsg == 0x01) {
+                //if (ccmsg == 0x01) {
+                if (ccmsg == 0x18) {
                     var val=Math.floor(msg[2]/64);
                     if(val==0) {
                         fireEvent("button_fixed");
@@ -394,36 +396,48 @@ Application.prototype.onload = function() {
                     }
                 }
                 // Update knob_coarse
-                if (ccmsg == 0x02) {
+                //if (ccmsg == 0x02) {
+                if (ccmsg == 0x19) {
                     var vmin=298, vmax=398;
                     var val=parseInt(msg[2])/127;
                     p.theFaderView_coarse.onUpdateValue(val);
                     document.getElementById("knob_coarse").style.setProperty("top", vmax-val*(vmax-vmin)+"px");
                 }
                 // Update knob_fine
-                if (ccmsg == 0x03) {
+                //if (ccmsg == 0x03) {
+                if (ccmsg == 0x1a) {
                     var vmix=458, vmax=530;
                     var val=parseInt(msg[2])/127;
                     p.theFaderView_fine.onUpdateValue(val);
                     document.getElementById("knob_fine").style.setProperty("top", vmax-(1-val)*(vmax-vmin)+"px");
                 }
                 // Update feedback
-                if (ccmsg == 0x04) {
+                //if (ccmsg == 0x04) {
+                if (ccmsg == 0x1b) {
                     var val=parseInt(msg[2])/127;
                     p.theFaderView_feedback.onUpdateValue(val);
                 }
-                break;
                 // Update Algorithm 
-                if (ccmsg == 0x05) {
+                //if (ccmsg == 0x05) {
+                if (ccmsg == 0x15) {
                     var max=127;
-                    var val= Math.floor(parseInt(msg[2]) / (127/8));
+                    //var val= Math.floor(parseInt(msg[2]) / (127/8));
+                    var val= Math.floor(parseInt(msg[2]) / (127/7));
                     p.theAlgView.setAlgorithm(val);
                 }
-                break;
                 // Update selected operator
-                if (ccmsg == 0x06) {
-                    var val=Math.floor(parseInt(msg[2]) / (127/5));
+                //if (ccmsg == 0x06) {
+                if (ccmsg == 0x16) {
+                    //var val=Math.floor(parseInt(msg[2]) / (127/5));
+                    var val=Math.floor(parseInt(msg[2]) / (127/3));
+                    console.log(val);
                     p.theAlgView.setOperator(val);
+                }
+                // Update Voice No (only available for preset)
+                if (ccmsg == 0x17) {
+                    var val=Math.floor(parseInt(msg[2]) / (127/8)) + 1;
+                    p.programNo=parseInt(val);
+                    p.recallPresetVoice(val);
                 }
                 break;
             }
