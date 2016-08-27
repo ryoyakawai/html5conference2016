@@ -12,30 +12,60 @@
     </style>
   </head>
   <body>
+    <div id="bluetooth">
+      <button id="searchdevice" class="mdl-button mdl-js-button mdl-button--icon">
+        <i id="bluetoothicon" class="material-icons">bluetooth</i>
+      </button>
+    </div>
     <div id="container"></div>
 
+    <div >
+      <button id="dispslider" class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">settings_applications</i>
+      </button>
+      <div id="sliderarea">
+        <input id="slider" type="range" max="6" min="0" step="0.025" class="hidden">
+      </div>
+    </div>
+    <!--
     <div id="blebutton">
       <button id="find" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Connect</button>
     </div>
+    -->
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.js" charset="utf-8"></script>
     <script type="text/javascript">
+    document.querySelector("#dispslider").addEventListener("mousedown", function(event){
+        if(document.querySelector("#slider").className=="hidden") {
+            document.querySelector("#slider").className="";
+        } else {
+            document.querySelector("#slider").className="hidden";
+        }
+    });
+    document.querySelector("#slider").addEventListener("input", function(event){
+        console.log(event.target.value);
+        sphere.rotation.y=event.target.value;
+    });
 
     function handleAcc (characteristic) {
+        console.log("Connected");
         return characteristic.startNotifications()
                              .then(function(data){
             characteristic.addEventListener("characteristicvaluechanged", function(data){
                 var angleX = convert(data.target.value.getFloat32(0, true));
                 var angleY = convert(data.target.value.getFloat32(4, true));
                 var angleZ = convert(data.target.value.getFloat32(8, true));
-                console.log("y: ", angleY);
+                console.log("(X, Y, Z) ", angleX+ ", "+ angleY +", "+angleZ);
+                
+                document.querySelector("#slider").value=angleZ;
+
                 if(typeof sphere!="undefined") {
-                    //sphere.rotation.x=Math.PI*angleX;
-                    sphere.rotation.y=angleY;
-                    //sphere.rotation.z=Math.PI*angleZ;
+                    //sphere.rotation.x=angleX;
+                    sphere.rotation.y=angleZ;
+                    //sphere.rotation.z=angleZ;
                 }
                 function convert(value) {
-                    return 2*Math.PI*value;
+                    return parseInt(75*(Math.abs(8*Math.PI*value)))/1000;
                 }
             });
         });
@@ -46,12 +76,14 @@
             service.getCharacteristic('917649a1-d98e-11e5-9eec-984fee0f808e') // Acc
                    .then(handleAcc, error),
         ]);
-        document.querySelector("#blebutton").style.setProperty("display", "none");
+        //document.querySelector("#blebutton").style.setProperty("display", "none");
+        document.querySelector("#bluetoothicon").innerHTML="bluetooth_connected";
     }
 
     function gatt (server) {
         console.log(server);
-        server.ongattserverdisconnected=function(msg){
+        server.device.ongattserverdisconnected=function(msg){
+            document.querySelector("#bluetoothicon").innerHTML="bluetooth";
             console.error("[server disconnected] ", msg);
         };
         server.getPrimaryService('917649a0-d98e-11e5-9eec-984fee0f808e').then(service, error);
@@ -76,7 +108,8 @@
         navigator.bluetooth.requestDevice(options).then(found, error);
     }
 
-    document.getElementById("find").addEventListener("click", find, false);
+    //document.querySelector("#find").addEventListener("click", find, false);
+    document.querySelector("#searchdevice").addEventListener("click", find, false);
     </script>
     <script type="text/javascript">
     var height = 640;
