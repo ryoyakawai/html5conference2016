@@ -11,7 +11,7 @@
   <body>
     <div id="connection">
       <div id="title">Candy Magic</div>
-      <button id="find" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Connect</button>
+      <button id="find" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Connect <i class="material-icons">bluetooth</i></button>
     </div>
     <div id="connected">
       <button id="d01" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"></button>
@@ -24,9 +24,19 @@
     </div>
     
     <script type="text/javascript">
-    function connectedHandler() {
-        document.querySelector("#connection").style.setProperty("display", "none");
-        document.querySelector("#connected").style.setProperty("display", "block");
+    function connectedHandler(type) {
+        switch(type) {
+            case "connected":
+                var connection="none";
+                var connected="block";
+                break;
+            case "disconnected":
+                var connection="block";
+                var connected="none";
+                break;
+        }
+        document.querySelector("#connection").style.setProperty("display", connection);
+        document.querySelector("#connected").style.setProperty("display", connected);
     }
     function handleCandyMagic (characteristic) {
         var data = new Uint8Array([1]);
@@ -67,11 +77,12 @@
     
     function gatt (server) {
         console.log(server);
-        server.ongattserverdisconnected=function(msg){
+        server.device.ongattserverdisconnected=function(msg){
+            connectedHandler("disconnected");
             console.error("[server disconnected] ", msg);
         };
         server.getPrimaryService('19b10000-e8f2-537e-4f6c-984fee0f808e').then(service, error);
-        connectedHandler();
+        connectedHandler("connected");
     }
     
     function found (device) {
