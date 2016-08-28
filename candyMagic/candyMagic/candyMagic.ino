@@ -18,13 +18,15 @@ const int TRIM_VAL_MAX=1023;
 
 void setup() {
   Serial.begin(9600);
-  while (!Serial);    // wait for the serial port to open
+  //while (!Serial);    // wait for the serial port to open
 
   Serial.println("Candy Magic Started");
 
   // set Motor/LED pin to output mode
   pinMode(motorPin, OUTPUT);
   pinMode(ledPin, OUTPUT);
+
+  digitalWrite(ledPin, LOW);          // initialize LED
 
   // set advertised local name and service UUID:
   blePeripheral.setLocalName("CandyMgc");
@@ -43,7 +45,18 @@ void setup() {
 }
 
 void loop() {
-  // listen for BLE peripherals to connect:
+
+  int sumReadyLedTime=0;
+  int readyLedTimer=500;
+  int readyBlinkTime=60;
+  while (readyLedTimer>sumReadyLedTime) {
+    digitalWrite(ledPin, HIGH);
+    delay(readyBlinkTime);
+    digitalWrite(ledPin, LOW);
+    delay(40*readyBlinkTime);
+    sumReadyLedTime+=41*readyBlinkTime;
+  }
+  
   BLECentral central = blePeripheral.central();
 
   // if a central is connected to peripheral:
@@ -54,6 +67,7 @@ void loop() {
 
     // while the central is still connected to peripheral:
     while (central.connected()) {
+      digitalWrite(ledPin, HIGH);         // will turn the LED on
       // if the remote device wrote to the characteristic,
       // use the value to control the time of running moter's duration:
       int duration=0;
@@ -80,18 +94,25 @@ void loop() {
           Serial.println(trimedDuration);
 
           digitalWrite(motorPin, HIGH);         // will turn the motor on
-          digitalWrite(ledPin, HIGH);         // will turn the LED on
-          delay(trimedDuration);
+          int sumTimer=0, blinkTime=150;
+          //delay(trimedDuration);
+          while(trimedDuration>sumTimer) {
+            digitalWrite(ledPin, LOW);
+            delay(blinkTime);
+            digitalWrite(ledPin, HIGH);
+            delay(blinkTime);
+            sumTimer+=2*blinkTime;
+          }
           digitalWrite(motorPin, LOW);          // will turn the motor off
-          digitalWrite(ledPin, LOW);          // will turn the LED off
-
         }
       }
-    }
+    } // central.connected();
 
     // when the central disconnects, print it out:
     Serial.print("Disconnected from central.");
     Serial.println(central.address());
+    digitalWrite(ledPin, LOW);          // will turn the LED off
+
   }
 }
 
