@@ -33,7 +33,7 @@ void setup() {
 
   // initialze serial port for debugging communications
   Serial.begin(9600); // initialize Serial communication
-  while (!Serial);    // wait for the serial port to open
+  //while (!Serial);    // wait for the serial port to open
  
   Serial.println("Earth GruGru Started");
   
@@ -69,8 +69,6 @@ void setup() {
     Serial.println("");
   }
       
-//  CurieIMU.attachInterrupt(eventCallback);
-
   // prepare & initiazlie BLE
   // enable LED pins for output.
   pinMode(BLE_CONNECT, OUTPUT);
