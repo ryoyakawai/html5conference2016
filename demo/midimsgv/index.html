@@ -18,6 +18,9 @@
       <div>
         <span>INPUT: <x-webmidiinput id="input-port" autoreselect></x-webmidiinput> <span id="midiinput-event-01"></span></span>
       </div>
+      <div>
+        <span>OUTPUT: <x-webmidioutput id="output-port" autoreselect></x-webmidioutput> <span id="midioutput-event-01"></span></span>
+      </div>
       
       <div id="disp-msg-exp">
         <div id="button-area">
@@ -47,6 +50,19 @@
     <script type="text/javascript">
     var timerId=0;
     window.addEventListener('midiin-event:input-port', function(event) {
+
+        // send msg to output
+        var output=document.getElementById("output-port");
+        if(output.checkOutputIdx!="false") {
+            if( ( event.detail.data[1]>0x22 && event.detail.data[1]<0x4a) 
+                && event.detail.data[1]!=0x46 
+                && event.detail.data[1]!=0x47
+                && event.detail.data[1]!=0x48 
+                && event.detail.data[1]!=0x49 
+               )output.sendRawMessage(event.detail.data);
+        }
+
+        // handle input msg
         var out=[], disp=true;
         if(event.detail.data[0]==0xfe || event.detail.data[0]==0xf8) {
             disp=false;
@@ -112,6 +128,7 @@
             exp='<span class="strong">'+vals.subType+"</span>";
             switch(vals.subType) {
                 case "noteOn":
+                    if(typeof(vals.itnl)=="undefined") vals.itnl="--";
                     exp+=" (Play " + vals.itnl + " with strength of " + vals.velocity + ".)";
                     break;
                 case "noteOff":
@@ -122,7 +139,7 @@
                     break;
             }
         } else {
-            clearExpArea();
+            clearToDefault();
             exp=vals.subType;
         }
         var disparea=document.getElementById(elemId);
