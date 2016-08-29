@@ -1,13 +1,25 @@
 /*
-   Copyright (c) 2016 Ryoya Kawai.  All rights reserved.
+  Copyright (c) 2016 Ryoya Kawai.  All rights reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 */
 #include <CurieBLE.h>
 
 BLEPeripheral blePeripheral;  // BLE Peripheral Device (the board you're programming)
-BLEService ledService("19B10000-E8F2-537E-4F6C-984FEE0F808E"); // BLE LED Service
+BLEService cmgcService("FFA900C0-EA51-4E35-9354-75215848D522");
 
 // BLE LED Characteristic - custom 128-bit UUID, read and writable by central
-BLECharCharacteristic ledCharacteristic("19B10001-E8F2-537E-4F6C-984FEE0F808E", BLERead | BLEWrite);
+BLECharCharacteristic cmgcCharacteristic("FFA900C1-EA51-4E35-9354-75215848D522", BLERead | BLEWrite);
 
 const int motorPin = 12; // pin to use for the Candy Magic Motor
 const int ledPin = 13; // pin to use for the led
@@ -30,14 +42,14 @@ void setup() {
 
   // set advertised local name and service UUID:
   blePeripheral.setLocalName("CandyMgc");
-  blePeripheral.setAdvertisedServiceUuid(ledService.uuid());
+  blePeripheral.setAdvertisedServiceUuid(cmgcService.uuid());
 
   // add service and characteristic:
-  blePeripheral.addAttribute(ledService);
-  blePeripheral.addAttribute(ledCharacteristic);
+  blePeripheral.addAttribute(cmgcService);
+  blePeripheral.addAttribute(cmgcCharacteristic);
 
   // set the initial value for the characeristic:
-  ledCharacteristic.setValue(0);
+  cmgcCharacteristic.setValue(0);
 
   // begin advertising BLE service:
   blePeripheral.begin();
@@ -45,17 +57,7 @@ void setup() {
 }
 
 void loop() {
-
-  int sumReadyLedTime=0;
-  int readyLedTimer=500;
-  int readyBlinkTime=60;
-  while (readyLedTimer>sumReadyLedTime) {
-    digitalWrite(ledPin, HIGH);
-    delay(readyBlinkTime);
-    digitalWrite(ledPin, LOW);
-    delay(40*readyBlinkTime);
-    sumReadyLedTime+=41*readyBlinkTime;
-  }
+  readyBlinkLED(ledPin);
   
   BLECentral central = blePeripheral.central();
 
@@ -67,33 +69,33 @@ void loop() {
 
     // while the central is still connected to peripheral:
     while (central.connected()) {
-      digitalWrite(ledPin, HIGH);         // will turn the LED on
+      digitalWrite(ledPin, HIGH);
       // if the remote device wrote to the characteristic,
       // use the value to control the time of running moter's duration:
       int duration=0;
-      if (ledCharacteristic.written()) {
-        if (ledCharacteristic.value()) {   // any value other than 0
-          switch(ledCharacteristic.value()) {
-            case 0x01:
-              duration=10;
-              break;
-            case 0x02:
-              duration=20;
-              break;
-            case 0x03:
-              duration=30;
-              break;
-            case 0x04:
-              duration=40;
-              break;
-            default:
-              break;              
-          }
+      if (cmgcCharacteristic.written()) {
+        switch(cmgcCharacteristic.value()) {
+        case 0x01:
+          duration=10;
+          break;
+        case 0x02:
+          duration=20;
+          break;
+        case 0x03:
+          duration=30;
+          break;
+        case 0x04:
+          duration=40;
+          break;
+        default:
+          break;              
+        }
+        if (duration>0) {
           // get Trim value
           int trimedDuration = duration * map(analogRead(trimPin), TRIM_VAL_MIN, TRIM_VAL_MAX, 0, 100);
           Serial.println(trimedDuration);
-
-          digitalWrite(motorPin, HIGH);         // will turn the motor on
+            
+          digitalWrite(motorPin, HIGH);
           int sumTimer=0, blinkTime=150;
           //delay(trimedDuration);
           while(trimedDuration>sumTimer) {
@@ -103,16 +105,28 @@ void loop() {
             delay(blinkTime);
             sumTimer+=2*blinkTime;
           }
-          digitalWrite(motorPin, LOW);          // will turn the motor off
+          digitalWrite(motorPin, LOW);
         }
       }
     } // central.connected();
-
+    
     // when the central disconnects, print it out:
     Serial.print("Disconnected from central.");
     Serial.println(central.address());
-    digitalWrite(ledPin, LOW);          // will turn the LED off
-
   }
 }
+
+void readyBlinkLED(int PINNO) {
+  int sumReadyLedTime=0;
+  int readyLedTimer=500;
+  int readyBlinkTime=60;
+  while (readyLedTimer>sumReadyLedTime) {
+    digitalWrite(PINNO, HIGH);
+    delay(readyBlinkTime);
+    digitalWrite(PINNO, LOW);
+    delay(39*readyBlinkTime);
+    sumReadyLedTime+=40*readyBlinkTime;
+  }
+}
+
 

@@ -1,13 +1,30 @@
+/*
+  Copyright (c) 2016 Ryoya Kawai.  All rights reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
 #include <CurieBLE.h>
 #include "CurieIMU.h"
 #include <MadgwickAHRS.h>
 
+#define BLE_CONNECT 13
+
 BLEPeripheral blePeripheral;
 
-BLEService imuService("917649A0-D98E-11E5-9EEC-984FEE0F808E"); // Custom UUID
+BLEService grgrService("77b10400-5912-4391-8826-509e9bcf2204");
 
-BLECharacteristic imuAccCharacteristic("917649A1-D98E-11E5-9EEC-984FEE0F808E", BLERead | BLENotify, 12 );
-BLEDescriptor imuAccDescriptor("2902", "block");
+BLECharacteristic grgrAccCharacteristic("77b10401-5912-4391-8826-509e9bcf2204", BLERead | BLENotify, 12 );
+BLEDescriptor grgrAccDescriptor("2902", "block");
 
 Madgwick filter; // initialise Madgwick object
 int ax, ay, az;
@@ -16,11 +33,8 @@ float yaw, pitch, roll;
 float lyaw=1000, lpitch=1000, lroll=1000;
 
 int factor = 800; // variable by which to divide gyroscope values, used to control sensitivity
-// note that an increased baud rate requires an increase in value of factor
 
 int calibrateOffsets = 1; // int to determine whether calibration takes place or not
-
-#define BLE_CONNECT 13 // T.addAttribute(imuAccDescriptor);
 
 union 
 {
@@ -69,32 +83,32 @@ void setup() {
     Serial.println("");
   }
       
-  // prepare & initiazlie BLE
   // enable LED pins for output.
   pinMode(BLE_CONNECT, OUTPUT);
-  
+
+  // prepare & initiazlie BLE  
   blePeripheral.setLocalName("eGruGru");
-  blePeripheral.setAdvertisedServiceUuid(imuService.uuid());  // add the service UUID
-  blePeripheral.addAttribute(imuService);   
-  blePeripheral.addAttribute(imuAccCharacteristic);
-  blePeripheral.addAttribute(imuAccDescriptor);
+  blePeripheral.setAdvertisedServiceUuid(grgrService.uuid());  // add the service UUID
+  blePeripheral.addAttribute(grgrService);   
+  blePeripheral.addAttribute(grgrAccCharacteristic);
+  blePeripheral.addAttribute(grgrAccDescriptor);
 
   const unsigned char initializerAcc[4] = { 0,0,0,0 }; 
-  imuAccCharacteristic.setValue( initializerAcc, 12);
+  grgrAccCharacteristic.setValue( initializerAcc, 12);
   
   blePeripheral.begin();  
 }
 
 void loop() {  
+  readyBlinkLED(BLE_CONNECT);
 
   BLECentral central = blePeripheral.central();
   if (central) {
     Serial.print("Connected to central: "); 
     Serial.println(central.address());
 
-    digitalWrite(BLE_CONNECT, HIGH); // LED ON in 13PIN
-
     while (central.connected()) {
+      digitalWrite(BLE_CONNECT, HIGH);
 
       CurieIMU.readMotionSensor(ax, ay, az, gx, gy, gz);       
 
@@ -117,17 +131,31 @@ void loop() {
         oData.a[2]=pitch;
 
         unsigned char *orientation = (unsigned char *)&oData;
-        imuAccCharacteristic.setValue(orientation, 12);
+        grgrAccCharacteristic.setValue(orientation, 12);
         lyaw=yaw; lroll=roll; lpitch=pitch;
       }
-
     }  // while (central.connected())
-
   } // if (central)
-  
 }
 
 int cround(float val) {
   return (int) 8*val;
+}
+
+void readyBlinkLED(int PINNO) {
+    int sumReadyLedTime=0;
+  int readyLedTimer=500;
+  int readyBlinkTime=60;
+  while (readyLedTimer>sumReadyLedTime) {
+    digitalWrite(PINNO, HIGH);
+    delay(readyBlinkTime);
+    digitalWrite(PINNO, LOW);
+    delay(readyBlinkTime);
+    digitalWrite(PINNO, HIGH);
+    delay(readyBlinkTime);
+    digitalWrite(PINNO, LOW);
+    delay(38*readyBlinkTime);
+    sumReadyLedTime+=42*readyBlinkTime;
+  }
 }
 
