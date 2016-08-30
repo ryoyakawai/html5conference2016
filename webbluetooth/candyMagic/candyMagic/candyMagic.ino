@@ -22,7 +22,8 @@ BLEService cmgcService("77b10300-5912-4391-8826-509e9bcf2204");
 BLECharCharacteristic cmgcCharacteristic("77b10301-5912-4391-8826-509e9bcf2204", BLERead | BLEWrite);
 
 const int motorPin = 12; // pin to use for the Candy Magic Motor
-const int ledPin = 13; // pin to use for the led
+const int ledPinB = 7;
+const int ledPin = 13;
 const int trimPin = 0;
 
 const int TRIM_VAL_MIN=151;
@@ -36,9 +37,11 @@ void setup() {
 
   // set Motor/LED pin to output mode
   pinMode(motorPin, OUTPUT);
+  pinMode(ledPinB, OUTPUT);
   pinMode(ledPin, OUTPUT);
 
   digitalWrite(ledPin, LOW);          // initialize LED
+  digitalWrite(ledPinB, LOW);          // initialize LED
 
   // set advertised local name and service UUID:
   blePeripheral.setLocalName("CandyMgc");
@@ -95,6 +98,7 @@ void loop() {
           int trimedDuration = duration * map(analogRead(trimPin), TRIM_VAL_MIN, TRIM_VAL_MAX, 0, 100);
           Serial.println(trimedDuration);
             
+          digitalWrite(ledPinB, HIGH);
           digitalWrite(motorPin, HIGH);
           int sumTimer=0, blinkTime=150;
           //delay(trimedDuration);
@@ -105,6 +109,7 @@ void loop() {
             delay(blinkTime);
             sumTimer+=2*blinkTime;
           }
+          digitalWrite(ledPinB, LOW);
           digitalWrite(motorPin, LOW);
         }
       }
