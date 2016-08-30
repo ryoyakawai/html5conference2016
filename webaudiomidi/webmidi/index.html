@@ -1,0 +1,71 @@
+<html>
+  <head>
+    <title>Web MIDI Demo | HTML5 Conference 2016</title>
+  </head>
+  <body>
+    <div><span>INPUT:</span> <select id="midiinput"><option value="0">Select One</option></select></div>
+    <div><span>OUTPUT:</span> <select id="midioutput"><option value="0">Select One</option></select></div>
+    <script type="text/javascript">
+    var inputs=[], outputs=[];
+    var inSelected=false, outSelected=false;
+    navigator.requestMIDIAccess({sysex: true}).then(successCallback, errorCallback);
+
+    function successCallback(midi) {
+        // input port
+        var inputItr=midi.inputs.values();
+        for(var i=inputItr.next(); !i.done; i=inputItr.next()) {
+            inputs.push(i.value);
+        }
+
+        // output port
+        var outputItr=midi.outputs.values();
+        for(var i=outputItr.next(); !i.done; i=outputItr.next()) {
+            outputs.push(i.value);
+        }
+
+        var selectIn=document.querySelector("#midiinput");
+        for(var i=0; i<inputs.length; i++) {
+            var option=new Option((inputs[i].name).trim(), i+1);
+            selectIn.appendChild(option);
+        }
+
+        var selectOut=document.querySelector("#midioutput");
+        for(var i=0; i<outputs.length; i++) {
+            var option=new Option((outputs[i].name).trim(), i+1);
+            selectOut.appendChild(option);
+        }
+
+        midi.onstatechange=function(event) {
+            // do something when connection state is chaneged
+        };
+
+        document.querySelector("#midiinput").addEventListener("change", function(event) {
+            if(inSelected!==false) inputs[inSelected].onmidimessage="";
+            if(event.target.value==0) {
+                inSelected=false;
+            } else {
+                inSelected=event.target.value-1;
+                inputs[inSelected].onmidimessage=onmidimessage;
+            }
+        });
+
+        function onmidimessage(event) {
+            if(outSelected!==false) outputs[outSelected].send(event.data);
+        }
+
+        document.querySelector("#midioutput").addEventListener("change", function(event) {
+            if(event.target.value==0) {
+                outSelected=false;
+            } else {
+                outSelected=event.target.value-1;
+            }
+        });
+
+    }
+
+    function errorCallback(msg) {
+        console.error("Error occured during enumerating MIDI devices", msg);
+    }
+    </script>
+  </body>
+</html>

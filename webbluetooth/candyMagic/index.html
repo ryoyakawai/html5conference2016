@@ -1,0 +1,162 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Candy Magic Dispenser | HTML5 Conference 2016</title>
+    <meta name="theme-color" content="#777777">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" sizes="192x192" href="favicon.png">
+    <link rel="stylesheet" href="./md/material.green-light_green.min.css">
+    <link rel="stylesheet" href="./md/icon_family_material_icons.css">
+    <script src="./md/material.min.js"></script>
+    <link href="./md/family_roboto_mono.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  </head>
+  <body>
+    <script type="text/javascript" src="register_sw.js"></script>
+    <div id="connection">
+      <div id="title">Candy Magic</div>
+      <button id="find" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Connect <i class="material-icons">bluetooth</i></button>
+    </div>
+    <div id="connected">
+      <button id="d01" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"></button>
+      <button id="d02" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"></button>
+      <button id="d03" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"></button>
+      <button id="d04" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"></button>
+    </div>
+    <div id="dispensing">
+      <div id="loader"><img id="loader-gif" src="./images/loader.gif"></div>
+    </div>
+    <div id="thankyou">
+      <div id="thankyoumsg">Thank you for using me!</div>
+      <div id="btconnection"><i id="bticon" class="material-icons">bluetooth_connected</i></div>
+      <div id="disconnectmsg">Connection will close automaticaly.</div>
+    </div>
+    
+    <script type="text/javascript">
+    let serviceUUID=("77b10300-5912-4391-8826-509e9bcf2204").toLowerCase();
+    let characteristicUUID=("77b10301-5912-4391-8826-509e9bcf2204").toLowerCase();
+
+    let cntdDevice;
+    function connectedHandler(type) {
+        let connection, connected, thankyou;
+        switch(type) {
+            case "connected":
+                connection="none";
+                connected="block";
+                thankyou="none";
+                setTimeout(function(){
+                    document.querySelector("#connected").style.setProperty("opacity", "1");
+                }, 50);
+                break;
+            case "disconnected":
+                connection="block";
+                connected="none";
+                thankyou="none";
+                break;
+            case "thankyou":
+                connection="none";
+                connected="none";
+                thankyou="block";
+                break;
+        }
+        document.querySelector("#connection").style.setProperty("display", connection);
+        document.querySelector("#connected").style.setProperty("display", connected);
+        document.querySelector("#thankyou").style.setProperty("display", thankyou);
+    }
+    function handleCandyMagic (characteristic) {
+        let data = new Uint8Array([1]);
+        document.querySelector("#d01").addEventListener("mousedown", dispense);
+        document.querySelector("#d02").addEventListener("mousedown", dispense);
+        document.querySelector("#d03").addEventListener("mousedown", dispense);
+        document.querySelector("#d04").addEventListener("mousedown", dispense);
+        function dispense(event) {
+            let data = new Uint8Array([1]);
+            dispenseId=event.target.parentNode.id;
+            data[0]=parseInt(dispenseId.replace("d", ""));
+            // data[0]=parseInt(10*Math.random()%4)+1;
+            dispansing(data[0]);
+            characteristic[0].writeValue(data);
+        }
+        
+        function dispansing(sec) {
+            document.querySelector("#connected").style.setProperty("display", "none");
+            document.querySelector("#connected").style.setProperty("opacity", "0");
+            document.querySelector("#dispensing").style.setProperty("display", "block");
+            setTimeout(
+                function() {
+                    document.querySelector("#dispensing").style.setProperty("display", "none");
+                    document.querySelector("#thankyou").style.setProperty("display", "block");
+                    setTimeout(function(){
+                        document.querySelector("#thankyou").style.setProperty("opacity", "1");
+                    }, 20);
+                    setTimeout(
+                        function() {
+                            cntdDevice.gatt.disconnect();
+                            connectedHandler("thankyou");
+                            document.querySelector("#bticon").innerHTML="bluetooth";
+                            document.querySelector("#disconnectmsg").innerHTML="Disconnected."
+                        }, 2000);
+                }, sec*1000+800);
+        }
+    }
+    function service (service) {
+        console.log(service);
+        connectedHandler("connected");
+        Promise.all([
+            service.getCharacteristic(characteristicUUID)
+        ]).then(handleCandyMagic, error);
+    }
+    
+    function gatt (server) {
+        console.log(server);
+        server.device.ongattserverdisconnected=function(msg){
+            connectedHandler("disconnected");
+            console.info("[server disconnected] ", msg);
+        };
+        console.log(serviceUUID);
+        server.getPrimaryService(serviceUUID).then(service, error);
+    }
+    
+    function found (device) {
+        cntdDevice=device;
+        device.gatt.connect().then(gatt, error);
+    }
+    
+    function error (e) {
+        console.log(e);
+    }
+    
+    
+    function find () {
+        let options = {
+            filters: [{
+                services: [serviceUUID],
+                namePrefix: 'CandyMgc'
+            }]
+        };
+        navigator.bluetooth.requestDevice(options).then(found, error);
+    }
+    
+    document.querySelector("#find").addEventListener("click", find, false);
+
+    /*
+    Copyright (c) 2016 Ryoya Kawai.  All rights reserved.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+     */
+
+    </script>
+  </body>
+</html>

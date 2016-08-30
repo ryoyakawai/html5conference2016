@@ -1,0 +1,184 @@
+31;2c<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>Earth GruGru | HTML5 Conference 2016</title>
+    <meta name="theme-color" content="#333333">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" sizes="192x192" href="favicon.png">
+    <link rel="stylesheet" href="./md/material.green-light_green.min.css">
+    <link rel="stylesheet" href="./md/icon_family_material_icons.css">
+    <script src="./md/material.min.js"></script>
+    <link href="./md/family_roboto_mono.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript" src="register_sw.js"></script>
+    <div id="bluetooth">
+      <button id="searchdevice" class="mdl-button mdl-js-button mdl-button--icon">
+        <i id="bluetoothicon" class="material-icons">bluetooth</i>
+      </button>
+    </div>
+    <div id="container"></div>
+
+    <div >
+      <button id="dispslider" class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">settings_applications</i>
+      </button>
+      <div id="sliderarea">
+        <input id="slider" type="range" max="6" min="0" step="0.025" class="hidden">
+      </div>
+    </div>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.js" charset="utf-8"></script>
+    <script type="text/javascript">
+    let serviceUUID=("77b10400-5912-4391-8826-509e9bcf2204").toLowerCase();
+    let characteristicUUID=("77b10401-5912-4391-8826-509e9bcf2204").toLowerCase();
+
+    document.querySelector("#dispslider").addEventListener("mousedown", function(event){
+        if(document.querySelector("#slider").className=="hidden") {
+            document.querySelector("#slider").className="";
+        } else {
+            document.querySelector("#slider").className="hidden";
+        }
+    });
+    document.querySelector("#slider").addEventListener("input", function(event){
+        sphere.rotation.y=event.target.value;
+    });
+
+    function handleAcc (characteristic) {
+        console.log("Connected");
+        return characteristic.startNotifications()
+                             .then(function(data){
+            characteristic.addEventListener("characteristicvaluechanged", function(data){
+                let angleX = convert(data.target.value.getFloat32(0, true));
+                let angleY = convert(data.target.value.getFloat32(4, true));
+                let angleZ = convert(data.target.value.getFloat32(8, true));
+                console.log("(X, Y, Z) ", angleX+ ", "+ angleY +", "+angleZ);
+                
+                document.querySelector("#slider").value=angleZ;
+
+                if(typeof sphere!="undefined") {
+                    //sphere.rotation.x=angleX;
+                    sphere.rotation.y=angleZ;
+                    //sphere.rotation.z=angleZ;
+                }
+                function convert(value) {
+                    return parseInt(75*(Math.abs(8*Math.PI*value)))/1000;
+                }
+            });
+        });
+    }
+    function service (service) {
+        console.log(service);
+        Promise.all([
+            service.getCharacteristic(characteristicUUID) // Acc
+                   .then(handleAcc, error),
+        ]);
+        document.querySelector("#bluetoothicon").innerHTML="bluetooth_connected";
+    }
+
+    function gatt (server) {
+        console.log(server);
+        server.device.ongattserverdisconnected=function(msg){
+            document.querySelector("#bluetoothicon").innerHTML="bluetooth";
+            console.info("[server disconnected] ", msg);
+        };
+        server.getPrimaryService(serviceUUID).then(service, error);
+    }
+
+    function found (device) {
+        console.log(device);
+        device.gatt.connect().then(gatt, error);
+    }
+
+    function error (e) {
+        console.log(e);
+    }
+
+    function find () {
+        let options = {
+            filters: [{
+                services: [serviceUUID],
+                namePrefix: "eGruGru"
+            }]
+        };
+        navigator.bluetooth.requestDevice(options).then(found, error);
+    }
+
+    document.querySelector("#searchdevice").addEventListener("click", find, false);
+    </script>
+    <script type="text/javascript">
+    let height = 640;
+    let width  = 640;
+    
+    // Renderer
+    let renderer = new THREE.WebGLRenderer();
+    renderer.setSize(height, width);
+    renderer.setClearColor(0x000000, 1);
+
+    // Add element
+    document.querySelector("#container").appendChild(renderer.domElement);
+
+    // Scene
+    let scene = new THREE.Scene();
+    
+    // Camera 
+    let camera=new THREE.PerspectiveCamera(73, width/height, 0.1, 10);
+    camera.position=new THREE.Vector3(0, 0, 8);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+    scene.add(camera);
+
+    // Light
+    let light = new THREE.DirectionalLight(0xffffff);
+    let pos=(Math.PI*23.4/180.0);
+    light.position = new THREE.Vector3(pos, pos, pos);
+    scene.add(light);
+
+    let ambientLight = new THREE.AmbientLight(0x333333);
+    scene.add(ambientLight);
+
+    // Sphere
+    let geometry = new THREE.SphereGeometry(1, 32, 32);
+    let loader=new THREE.TextureLoader();
+    let textureEarth=loader.load("images/earth.jpg");
+    let material = new THREE.MeshPhongMaterial( {map: textureEarth});    
+    let sphere = new THREE.Mesh(geometry, material);
+    sphere.rotation.y = Math.PI;
+    scene.add(sphere);
+        
+    // Render
+    let baseTime = +new Date;
+    function render() {
+        requestAnimationFrame(render);
+        camera.position.x=1;
+        camera.position.y=1;
+        camera.position.z=1;
+        renderer.render(scene, camera);
+
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+    }   
+    render();
+
+    /*
+    Copyright (c) 2016 Ryoya Kawai.  All rights reserved.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+     */
+
+    </script>
+  </body>
+</html>
