@@ -20,6 +20,7 @@
 #define TXRX_BUF_LEN 20 //max number of bytes
 #define RX_BUF_LEN 20 //max number of bytes
 
+#define DISP_MODE_LED 7
 #define BLE_CONNECT 13
 #define ccPin 0
 
@@ -60,6 +61,9 @@ void setup() {
   Serial.println("BLE MIDI Started");
 
   // enable LED pins for output.
+  pinMode(DISP_MODE_LED, OUTPUT);
+  digitalWrite(DISP_MODE_LED, LOW);
+
   pinMode(BLE_CONNECT, OUTPUT);
   digitalWrite(BLE_CONNECT, LOW);
 
@@ -230,7 +234,13 @@ void midiDeviceDisconnectHandler(BLECentral& central) {
 }
 
 void midiCharacteristicWritten(BLECentral& central, BLECharacteristic& characteristic) { 
-  // central wrote new value to characteristic, update LED
+  if((midiIOChar.value())[2]==0xb0) { 
+    if((midiIOChar.value())[3]==0x11  && (midiIOChar.value())[4]>=0x40) {
+      digitalWrite(DISP_MODE_LED, HIGH);
+    } else {
+      digitalWrite(DISP_MODE_LED, LOW);
+    }
+  }
   Serial.print("Characteristic event, written");
 }
 
@@ -251,28 +261,25 @@ int midiPitch(float val) {
 }
 
 void readyBlinkLED(int PINNO) {
-    int sumReadyLedTime=0;
+  int sumReadyLedTime=0;
   int readyLedTimer=500;
   int readyBlinkTime=60;
+  int blinkCount=2;
   while (readyLedTimer>sumReadyLedTime) {
-    digitalWrite(PINNO, HIGH);
-    delay(readyBlinkTime);
-    digitalWrite(PINNO, LOW);
-    delay(readyBlinkTime);
-    digitalWrite(PINNO, HIGH);
-    delay(readyBlinkTime);
-    digitalWrite(PINNO, LOW);
+    blinks(PINNO, blinkCount, readyBlinkTime);
     delay(4*readyBlinkTime);
-    digitalWrite(PINNO, HIGH);
-    delay(readyBlinkTime);
-    digitalWrite(PINNO, LOW);
-    delay(readyBlinkTime);
-    digitalWrite(PINNO, HIGH);
-    delay(readyBlinkTime);
-    digitalWrite(PINNO, LOW);
-
+    blinks(PINNO, blinkCount, readyBlinkTime);
     delay(38*readyBlinkTime);
-    sumReadyLedTime+=44*readyBlinkTime;
+    sumReadyLedTime+=44*readyBlinkTime;  
   }
 }
+void blinks(int PINNO, int count, int interval) {
+  for(int i=0; i<count; i++) {
+    digitalWrite(PINNO, HIGH);
+    delay(interval);
+    digitalWrite(PINNO, LOW);
+    delay(interval);
+  }
+}
+
 

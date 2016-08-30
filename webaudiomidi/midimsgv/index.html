@@ -18,7 +18,7 @@
     <link rel="import" href="bower_components/x-webmidi/x-webmidirequestaccess.html">
     <div id="title">MIDI Message Viewer</div>
 
-    <x-webmidirequestaccess sysex input output></x-webmidirequestaccess>
+    <x-webmidirequestaccess id="x-webmidi" sysex input output></x-webmidirequestaccess>
     <div id="inputblock">
       <div>
         <span>INPUT: <x-webmidiinput id="input-port" autoreselect></x-webmidiinput> <span id="midiinput-event-01"></span></span>
@@ -55,7 +55,6 @@
     <script type="text/javascript">
     var timerId=0;
     window.addEventListener('midiin-event:input-port', function(event) {
-
         // send msg to output
         var output=document.getElementById("output-port");
         if(output.checkOutputIdx!="false") {
@@ -64,7 +63,7 @@
                 && event.detail.data[1]!=0x47
                 && event.detail.data[1]!=0x48 
                 && event.detail.data[1]!=0x49 
-               )output.sendRawMessage(event.detail.data);
+               ) output.sendRawMessage(event.detail.data);
         }
 
         // handle input msg
@@ -86,13 +85,27 @@
 
     var dispState="remove"; // leave/remove
     document.querySelector("#disp-state").addEventListener("mousedown", function(event){
+        var outVal=0;
         if(dispState=="leave") {
             dispState="remove";
             event.target.innerHTML="play_circle_outline";
+            outVal=0x00;
         } else {
             dispState="leave";
             event.target.innerHTML="pause_circle_outline";
+            outVal=0x40;
         }
+        // search output port which has same name with input port
+        var midi=document.getElementById("x-webmidi").midi;
+        var outputs=midi.outputs, inputs=midi.inputs;
+        var inputIdx=document.getElementById("input-port").inputIdx;
+        for(var i=0; i<outputs.length; i++) {
+            if(outputs[i].name==inputs[inputIdx].name) {
+                outputs[i].send([0xb0, 0x11, outVal]);
+                break;
+            }
+        }
+
     });
     document.querySelector("#clear-button").addEventListener("mousedown", function(event){
         clearToDefault();
