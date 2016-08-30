@@ -5,13 +5,13 @@ body {
 }
 div#container { 
   text-align: center;
-  margin-top:80px;
+  margin-top:20px;
   width:640px;
   border:0px;
 }
 #bluetooth {
  float:right;
- margin:10px 0px 0px 0px;
+ margin:80px 0px 0px 0px;
  size:20px;
  color:white;
 }

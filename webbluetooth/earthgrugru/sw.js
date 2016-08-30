@@ -1,4 +1,4 @@
-3/* sw.js */
+/* sw.js */
 importScripts('serviceworker-cache-polyfill.js');
 var version="1.0";
 var CACHE_NAME = 'earth-gru-gru-'+version;
@@ -11,6 +11,8 @@ var urlsToCache = [
     './styles.css',
     './sw.js',
 
+    './js/three.js',
+    
     './images/earth.jpg',
     './images/earthguruguru_144x144.png',
     
