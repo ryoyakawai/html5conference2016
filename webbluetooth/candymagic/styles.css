@@ -1,0 +1,89 @@
+body { 
+  margin: 0 auto;
+  background-color: #888;
+  max-width: 300px;
+  font-family: Roboto;
+  color: white;
+}
+#find { 
+  width: 100%;
+}
+#title { 
+  color: rgb(255, 255, 255);
+  font-size: 24px;
+  letter-spacing: -.02em;
+  text-align: center;
+  width: 100%;
+  padding: 12px 0;
+  padding-top: 280px;
+}
+#connect { 
+  color: white;
+  background-color: #4CAF50;
+  width: 100%;
+  font-weight: bold;
+}
+#connected {
+  opacity: 0;
+  transition: 0.5s;
+  text-align: center;
+  padding-top: 160px;
+  display: none;
+}
+#thankyou {
+  display: none;  
+  transition: 0.5s;
+  padding-top: 200px;
+  opacity:0;
+}
+#thankyoumsg { 
+  color: rgb(255, 255, 255);
+  font-size: 24px;
+  font-weight:bold;
+  letter-spacing: -.02em;
+  text-align: center;
+  width: 100%;
+  padding: 12px 0;
+}
+#bticon {
+  font-size:80px;
+}
+#disconnectmsg {
+  color: rgb(255, 255, 255);
+  text-align: center;
+  width: 100%;
+  padding: 12px 0;
+  padding: 20px 0px;
+}
+#btconnection {
+  padding-top:20px;
+  text-align: center;
+  width: 100%;
+}
+#d01, #d02, #d03, #d04 { 
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  color:white;
+  margin:10px;
+}
+#d01 { background-color:#4084f1 }
+#d02 { background-color:#e94236 }
+#d03 { background-color:#fbbd06 }
+#d04 { background-color:#33a952 }
+
+#motor { 
+  width: 100%;
+}
+#dispensing { 
+  display: none;
+}
+#loader {
+  text-align: center;
+  width: 100%;
+}
+#loader-gif { 
+  padding-top: 200px;
+  width:150px;
+  height:150px;
+}
