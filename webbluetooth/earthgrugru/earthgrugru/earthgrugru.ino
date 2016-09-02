@@ -53,36 +53,6 @@ void setup() {
   Serial.println("Earth GruGru Started");
   
   CurieIMU.begin();
-
-  if (calibrateOffsets == 1) {
-    // use the code below to calibrate accel/gyro offset values
-    Serial.println("Internal sensor offsets BEFORE calibration...");
-    Serial.print(CurieIMU.getAccelerometerOffset(X_AXIS)); Serial.print("\t");
-    Serial.print(CurieIMU.getAccelerometerOffset(Y_AXIS)); Serial.print("\t");
-    Serial.print(CurieIMU.getAccelerometerOffset(Z_AXIS)); Serial.print("\t");
-    Serial.print(CurieIMU.getGyroOffset(X_AXIS)); Serial.print("\t");
-    Serial.print(CurieIMU.getGyroOffset(Y_AXIS)); Serial.print("\t");
-    Serial.print(CurieIMU.getGyroOffset(Z_AXIS)); Serial.print("\t");
-    Serial.println("");
-
-    Serial.print("Starting Gyroscope calibration...");
-    CurieIMU.autoCalibrateGyroOffset();
-    Serial.println(" Done");
-    Serial.print("Starting Acceleration calibration...");
-    CurieIMU.autoCalibrateAccelerometerOffset(X_AXIS, 0);
-    CurieIMU.autoCalibrateAccelerometerOffset(Y_AXIS, 0);
-    CurieIMU.autoCalibrateAccelerometerOffset(Z_AXIS, 1);
-    Serial.println(" Done");
-
-    Serial.println("Internal sensor offsets AFTER calibration...");
-    Serial.print(CurieIMU.getAccelerometerOffset(X_AXIS)); Serial.print("\t");
-    Serial.print(CurieIMU.getAccelerometerOffset(Y_AXIS)); Serial.print("\t");
-    Serial.print(CurieIMU.getAccelerometerOffset(Z_AXIS)); Serial.print("\t");
-    Serial.print(CurieIMU.getGyroOffset(X_AXIS)); Serial.print("\t");
-    Serial.print(CurieIMU.getGyroOffset(Y_AXIS)); Serial.print("\t");
-    Serial.print(CurieIMU.getGyroOffset(Z_AXIS)); Serial.print("\t");
-    Serial.println("");
-  }
       
   // enable LED pins for output.
   pinMode(BLE_CONNECT, OUTPUT);
@@ -95,7 +65,7 @@ void setup() {
   blePeripheral.addAttribute(grgrAccDescriptor);
 
   const unsigned char initializerAcc[4] = { 0,0,0,0 }; 
-  grgrAccCharacteristic.setValue( initializerAcc, 12);
+  grgrAccCharacteristic.setValue(initializerAcc, 12);
   
   blePeripheral.begin();  
 }
@@ -107,6 +77,7 @@ void loop() {
   if (central) {
     Serial.print("Connected to central: "); 
     Serial.println(central.address());
+    autoIMUCalibration();
 
     while (central.connected()) {
       digitalWrite(BLE_CONNECT, HIGH);
@@ -165,5 +136,36 @@ void blinks(int PINNO, int count, int interval) {
   }
 }
 
+void autoIMUCalibration() {
+  if (calibrateOffsets == 1) {
+    // use the code below to calibrate accel/gyro offset values
+    Serial.println("Internal sensor offsets BEFORE calibration...");
+    Serial.print(CurieIMU.getAccelerometerOffset(X_AXIS)); Serial.print("\t");
+    Serial.print(CurieIMU.getAccelerometerOffset(Y_AXIS)); Serial.print("\t");
+    Serial.print(CurieIMU.getAccelerometerOffset(Z_AXIS)); Serial.print("\t");
+    Serial.print(CurieIMU.getGyroOffset(X_AXIS)); Serial.print("\t");
+    Serial.print(CurieIMU.getGyroOffset(Y_AXIS)); Serial.print("\t");
+    Serial.print(CurieIMU.getGyroOffset(Z_AXIS)); Serial.print("\t");
+    Serial.println("");
+
+    Serial.print("Starting Gyroscope calibration...");
+    CurieIMU.autoCalibrateGyroOffset();
+    Serial.println(" Done");
+    Serial.print("Starting Acceleration calibration...");
+    CurieIMU.autoCalibrateAccelerometerOffset(X_AXIS, 0);
+    CurieIMU.autoCalibrateAccelerometerOffset(Y_AXIS, 0);
+    CurieIMU.autoCalibrateAccelerometerOffset(Z_AXIS, 1);
+    Serial.println(" Done");
+
+    Serial.println("Internal sensor offsets AFTER calibration...");
+    Serial.print(CurieIMU.getAccelerometerOffset(X_AXIS)); Serial.print("\t");
+    Serial.print(CurieIMU.getAccelerometerOffset(Y_AXIS)); Serial.print("\t");
+    Serial.print(CurieIMU.getAccelerometerOffset(Z_AXIS)); Serial.print("\t");
+    Serial.print(CurieIMU.getGyroOffset(X_AXIS)); Serial.print("\t");
+    Serial.print(CurieIMU.getGyroOffset(Y_AXIS)); Serial.print("\t");
+    Serial.print(CurieIMU.getGyroOffset(Z_AXIS)); Serial.print("\t");
+    Serial.println("");
+  }
+}
 
 

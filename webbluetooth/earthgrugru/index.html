@@ -49,14 +49,13 @@
     });
 
     function handleAcc (characteristic) {
-        console.log("Connected");
-        return characteristic.startNotifications()
-                             .then(function(data){
-            characteristic.addEventListener("characteristicvaluechanged", function(data){
+        console.log("Complete making connection.");
+        return characteristic[0].startNotifications().then(function(data){
+            characteristic[0].addEventListener("characteristicvaluechanged", function(data){
                 let angleX = convert(data.target.value.getFloat32(0, true));
                 let angleY = convert(data.target.value.getFloat32(4, true));
                 let angleZ = convert(data.target.value.getFloat32(8, true));
-                console.log("(X, Y, Z) ", angleX+ ", "+ angleY +", "+angleZ);
+                console.log("[X Y Z] " +angleX+ "\t"+ angleY +"\t"+angleZ );
                 
                 document.querySelector("#slider").value=angleZ;
 
@@ -75,8 +74,8 @@
         console.log(service);
         Promise.all([
             service.getCharacteristic(characteristicUUID) // Acc
-                   .then(handleAcc, error),
-        ]);
+                   
+        ]).then(handleAcc, error);
         document.querySelector("#bluetoothicon").innerHTML="bluetooth_connected";
     }
 
