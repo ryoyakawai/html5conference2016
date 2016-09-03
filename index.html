@@ -1,6 +1,7 @@
 <!DOCTYPE HTML>
 <html>
   <head>
+    <meta charset="UTF-8">
     <title>HTML5 Conference 2016 @Tokyo</title>
     <link rel="stylesheet" href="./webbluetooth/candymagic/md/icon_family_material_icons.css">
     <script src="./webbluetooth/candymagic/md/material.min.js"></script>
@@ -11,25 +12,36 @@
     ul { margin: 0.5em 0.2em }
     li { line-height: 1.7em }
     h2 { margin: 0.5em 0.5em }
+    clear { clear:both }
+    #slide { float:left; width:600px }
+    #appcode { float:left; width:550px; padding:2px 20px 60px 2px; }
     </style>
   </head>
   <body>
     <script type="text/javascript" src="register_sw.js"></script>
     <h1>Demo for HTML5 Conference 2016 @Tokyo</h1>
-    <h2>Web Audio API, Web MIDI API <i class="material-icons">audiotrack</i></h2>
-    <ul>
-      <li>Delay Demo [<a href="https://ryoyakawai.github.io/html5conference2016/webaudiomidi/delay/index.html">App</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webaudiomidi/delay">code</a>]</li>
-      <li>Pitch Change & Delay Demo [<a href="https://ryoyakawai.github.io/html5conference2016/webaudiomidi/pitch/index.html">App</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webaudiomidi/pitch/">code</a>]</li>
-      <li>FM Synth developed by <a href="https://twitter.com/takmiz" target="_blank">@takmiz</a> [<a href="https://ryoyakawai.github.io/html5conference2016/webaudiomidi/fmsynth/index.html">App</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webaudiomidi/fmsynth/">Code</a>] </li>
-      <li>Web MIDI API basic sample [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webaudiomidi/webmidi/">Code</a>]</li>
-      <li>MIDI Message Viewer [<a href="https://ryoyakawai.github.io/html5conference2016/webaudiomidi/midimsgv/index.html">App</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webaudiomidi/midimsgv/">Code</a>]</li>
-      <li>Bluetooth LE MIDI Controller with Arduino 101 [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webaudiomidi/blemidicon/blemidicon">Sketch</a>]</li>
-    </ul>
-    <br>
-    <h2>Web Bluetooth <i class="material-icons">bluetooth</i></h2>
-    <ul>
-      <li>Earth Gru Gru with Arduino 101 [<a href="https://ryoyakawai.github.io/html5conference2016/webbluetooth/earthgrugru/index.html">App</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webbluetooth/earthgrugru/">Code</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webbluetooth/earthgrugru/earthgrugru/">Sketch</a>]</li>
-      <li>Candy Magic with Arduino 101 [<a href="https://ryoyakawai.github.io/html5conference2016/webbluetooth/candymagic/index.html">App</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webbluetooth/candymagic/">Code</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webbluetooth/candymagic/candymagic/">Sketch</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/blob/gh-pages/webbluetooth/candymagic/ecircuit/candyMagic_electricCircuit.png">ElectricCircuit</a>]</li>
-    </ul>
+    <div id="appcode">
+      <h2>Web Audio API, Web MIDI API <i class="material-icons">audiotrack</i></h2>
+      <ul>
+        <li>Delay Demo [<a href="https://ryoyakawai.github.io/html5conference2016/webaudiomidi/delay/index.html">App</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webaudiomidi/delay">code</a>]</li>
+        <li>Pitch Change & Delay Demo [<a href="https://ryoyakawai.github.io/html5conference2016/webaudiomidi/pitch/index.html">App</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webaudiomidi/pitch/">code</a>]</li>
+        <li>FM Synth developed by <a href="https://twitter.com/takmiz" target="_blank">@takmiz</a> [<a href="https://ryoyakawai.github.io/html5conference2016/webaudiomidi/fmsynth/index.html">App</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webaudiomidi/fmsynth/">Code</a>] </li>
+        <li>Web MIDI API basic sample [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webaudiomidi/webmidi/">Code</a>]</li>
+        <li>MIDI Message Viewer [<a href="https://ryoyakawai.github.io/html5conference2016/webaudiomidi/midimsgv/index.html">App</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webaudiomidi/midimsgv/">Code</a>]</li>
+        <li>Bluetooth LE MIDI Controller with Arduino 101 [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webaudiomidi/blemidicon/blemidicon">Sketch</a>]</li>
+      </ul>
+      <br>
+      <h2>Web Bluetooth <i class="material-icons">bluetooth</i></h2>
+      <ul>
+        <li>Earth Gru Gru with Arduino 101 [<a href="https://ryoyakawai.github.io/html5conference2016/webbluetooth/earthgrugru/index.html">App</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webbluetooth/earthgrugru/">Code</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webbluetooth/earthgrugru/earthgrugru/">Sketch</a>]</li>
+        <li>Candy Magic with Arduino 101 [<a href="https://ryoyakawai.github.io/html5conference2016/webbluetooth/candymagic/index.html">App</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webbluetooth/candymagic/">Code</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/tree/gh-pages/webbluetooth/candymagic/candymagic/">Sketch</a>] [<a href="https://github.com/ryoyakawai/html5conference2016/blob/gh-pages/webbluetooth/candymagic/ecircuit/candyMagic_electricCircuit.png">ElectricCircuit</a>]</li>
+      </ul>
+    </div>
+    <div id="slide">
+      <iframe src="//www.slideshare.net/slideshow/embed_code/key/3UAu7xepCeSUaM" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/ryoyakawai/audioweb-web-audiomidi-web-bluetooth" title="AudioとガジェットをWebで遊ぶ - Web Audio/MIDI Web Bluetooth -" target="_blank">AudioとガジェットをWebで遊ぶ - Web Audio/MIDI Web Bluetooth -</a> </strong> from <strong><a href="//www.slideshare.net/ryoyakawai" target="_blank">Ryoya Kawai</a></strong> </div>
+    </div>
+
+
+    <div class="clear"></div>
   </body>
 </html>
