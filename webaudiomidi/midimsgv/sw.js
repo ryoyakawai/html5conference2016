@@ -1,6 +1,6 @@
 /* sw.js */
 importScripts('serviceworker-cache-polyfill.js');
-var version="1.0";
+var version="1.1";
 var CACHE_NAME = 'midi_msg_viewer-'+version;
 var urlsToCache = [
     './index.html',
