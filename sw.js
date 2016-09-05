@@ -1,6 +1,6 @@
 /* sw.js */
 importScripts('serviceworker-cache-polyfill.js');
-var version="1.2";
+var version="1.3";
 var CACHE_NAME = 'html5conf2016-index-'+version;
 var urlsToCache = [
     './index.html',
