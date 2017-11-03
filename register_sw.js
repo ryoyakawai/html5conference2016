@@ -1,7 +1,7 @@
-window.addEventListener('load', function() {
+window.addEventListener('load', () => {
     if(document.location.protocol=="https:" || document.location.hostname=="localhost") {
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').then(function(registration) {
+            navigator.serviceWorker.register('./sw.js').then( registration => {
                 console.log('ServiceWorker: Registration Succeed. Scope: ', registration.scope);
             }).catch(function(err) {
                 console.log('ServiceWorker: Registration Failed.  Message: ', err);
