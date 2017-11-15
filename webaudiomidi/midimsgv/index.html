@@ -58,11 +58,11 @@
         // send msg to output
         var output=document.getElementById("output-port");
         if(output.checkOutputIdx!="false") {
-            if( ( event.detail.data[1]>0x22 && event.detail.data[1]<0x4a) 
-                && event.detail.data[1]!=0x46 
-                && event.detail.data[1]!=0x47
-                && event.detail.data[1]!=0x48 
-                && event.detail.data[1]!=0x49 
+            if( ( event.detail.data[1]>0x22 && event.detail.data[1]<=0x7f) 
+                // && event.detail.data[1]!=0x46 
+                // && event.detail.data[1]!=0x47
+                // && event.detail.data[1]!=0x48 
+                // && event.detail.data[1]!=0x49 
                ) output.sendRawMessage(event.detail.data);
         }
 
